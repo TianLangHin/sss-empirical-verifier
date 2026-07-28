@@ -113,6 +113,31 @@ public:
         // The resultant node is a child node, and thus has a length one more than the original.
         return Node(position, length + 1, ancestry, left_rank);
     }
+
+    bool is_ancestor_of(const Node& other) {
+        // Comparison as per Lemma A.3.1.
+        // The additional clause of `length < other.length` is added due to the assumption of Lemma A.3.1,
+        // and that it is impossible for a longer node to be the ancestor of a shorter or equal-lengthed one.
+        uint64_t base = power[length];
+        return length < other.length && ancestry % base == other.ancestry % base;
+    }
+
+    bool is_root() {
+        // The root node is uniquely the node that has a length of zero.
+        return length == 0;
+    }
+
+    std::size_t get_length() const {
+        return length;
+    }
+
+    Position& get_position() const {
+        return position;
+    }
+
+    uint64_t get_left_rank() const {
+        return left_rank;
+    }
 };
 
 #endif
