@@ -2,7 +2,9 @@
 #define NODE_HPP
 
 #include <array>
+#include <cassert>
 #include <cstdint>
+#include <optional>
 
 // An instance of the `Node` class represents a node of the game tree `G_{w, d}`.
 // To make a `Node` allocatable on the stack, `w` and `d` are made to be compile-time generic parameters.
@@ -28,6 +30,47 @@ public:
 
     Node(Position& position, std::size_t length, uint64_t ancestry, uint64_t left_rank):
         position {position}, length {length}, ancestry {ancestry}, left_rank {left_rank} {}
+
+    Node parent() {
+        assert(length > 0);
+
+        Position position {this->position};
+        position[length - 1] = 0;
+
+        return Node(position, length - 1, ancestry, left_rank);
+    }
+
+    std::optional<Node> first() {
+        if (length == Depth) {
+            return std::nullopt;
+        }
+
+        Position position {this->position};
+        position[length] = 1;
+
+        return Node(position, length + 1, ancestry, left_rank);
+    }
+
+    std::optional<Node> next() {
+        if (position[length - 1] == Width) {
+            return std::nullopt;
+        }
+
+        Position position {this->position};
+        ++position[length - 1];
+
+        return Node(position, length, ancestry, left_rank);
+    }
+
+    Node make_move(std::size_t i) {
+        assert(length < Depth);
+        assert(1 <= i && i <= Width);
+
+        Position position {this->position};
+        position[length] = i;
+
+        return Node(position, length + 1, ancestry, left_rank);
+    }
 };
 
 #endif
