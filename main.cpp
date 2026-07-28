@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "theory/heuristic.hpp"
 #include "tree/node.hpp"
 
 int main() {
@@ -12,6 +13,13 @@ int main() {
     std::cout << (n2.has_value() == true) << '\n';
     auto n3 = n2.value().next().value().next();
     std::cout << (n3.has_value() == false) << '\n';
+
+    std::vector<int> best = best_case(3, 3);
+    std::vector<int> worst = worst_case(3, 3);
+
+    for (int i = 0; i < 27; ++i) {
+        std::cout << i << ' ' << best[i] << ' ' << worst[i] << '\n';
+    }
 
     return 0;
 }
