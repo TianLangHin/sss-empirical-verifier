@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "theory/computation.hpp"
 #include "theory/heuristic.hpp"
 #include "tree/node.hpp"
 
@@ -20,6 +21,13 @@ int main() {
     for (int i = 0; i < 27; ++i) {
         std::cout << i << ' ' << best[i] << ' ' << worst[i] << '\n';
     }
+
+    Computation c1 { Case1 { .r = 1, .n = 3 } };
+    Computation c2 { Case1 { .r = 1, .n = 3 } };
+    std::cout << (c1 == c2) << '\n';
+    Computation c3 { Case5 { .n = 10 } };
+    Computation c4 { Case6 { .n = 10 } };
+    std::cout << (c3 == c4) << '\n';
 
     return 0;
 }
