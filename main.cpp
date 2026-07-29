@@ -1,5 +1,8 @@
+#include <functional>
 #include <iostream>
+#include <limits>
 
+#include "algorithm/alpha_beta.hpp"
 #include "theory/computation.hpp"
 #include "theory/heuristic.hpp"
 #include "theory/paths.hpp"
@@ -39,6 +42,14 @@ int main() {
         std::cout << std::format("{} ", c);
     }
     std::cout << '\n';
+
+    Node<4, 4> node {};
+    int limit = std::numeric_limits<int>::max();
+    int leaf_count = 0;
+    std::vector<int> worst_values = worst_case(4, 4);
+    std::function<int(Node<4, 4>&)> worst_heuristic = std::bind(heuristic<4, 4>, worst_values, std::placeholders::_1);
+    int ab_result = alpha_beta(node, worst_heuristic, -limit, limit, leaf_count);
+    std::cout << "Result: " << ab_result << " Leaf Count: " << leaf_count << '\n';
 
     return 0;
 }
