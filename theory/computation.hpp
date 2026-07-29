@@ -2,6 +2,7 @@
 #define COMPUTATION_HPP
 
 #include <cstddef>
+#include <format>
 #include <variant>
 
 // Counts an instance of Case 1 of the SSS* state space operator being executed.
@@ -28,12 +29,12 @@ struct Case3 {
 
 // Counts an instance of Case 4 of the SSS* state space operator being executed.
 // Annotated with the size of OPEN `n`,
-// the number of spaces from the top the new element is inserted `insertion_index` (parameter `j` as per Section 5.1),
-// and the number of elements with an infinite merit `infinity_count` (parameter `l` as per Section 5.1).
+// the number of spaces from the top the new element is inserted `j` (parameter `j` as per Section 5.1),
+// and the number of elements with an infinite merit `l` (parameter `l` as per Section 5.1).
 struct Case4 {
     std::size_t n;
-    std::size_t insertion_index;
-    std::size_t infinity_count;
+    std::size_t j;
+    std::size_t l;
     bool operator==(const Case4& other) const = default;
 };
 
@@ -61,5 +62,29 @@ struct Case7 {
 // Since the computations of SSS* will be collected into a vector,
 // we define `Computation` as an `std::variant` that can contain all seven types of computations.
 typedef std::variant<Case1, Case2, Case3, Case4, Case5, Case6, Case7> Computation;
+
+// To allow the display of these computations for analysis,
+// we define the following logic to make `Computation` instances printable via `std::format`.
+template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+
+template <>
+struct std::formatter<Computation> {
+    constexpr std::format_parse_context::iterator parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    template <typename FormatContext>
+    FormatContext::iterator format(const Computation& computation, FormatContext& ctx) const {
+        return std::visit(overloaded {
+            [&](Case1 c) { return std::format_to(ctx.out(), "1({}, {})", c.r, c.n); },
+            [&](Case2 c) { return std::format_to(ctx.out(), "2({})", c.n); },
+            [&](Case3 c) { return std::format_to(ctx.out(), "3({})", c.n); },
+            [&](Case4 c) { return std::format_to(ctx.out(), "4({}, {}, {})", c.n, c.j, c.l); },
+            [&](Case5 c) { return std::format_to(ctx.out(), "5({})", c.n); },
+            [&](Case6 c) { return std::format_to(ctx.out(), "6({})", c.n); },
+            [&](Case7 c) { return std::format_to(ctx.out(), "7({})", c.n); }
+        }, computation);
+    }
+};
 
 #endif

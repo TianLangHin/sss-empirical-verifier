@@ -2,6 +2,7 @@
 
 #include "theory/computation.hpp"
 #include "theory/heuristic.hpp"
+#include "theory/paths.hpp"
 #include "tree/node.hpp"
 
 int main() {
@@ -28,6 +29,16 @@ int main() {
     Computation c3 { Case5 { .n = 10 } };
     Computation c4 { Case6 { .n = 10 } };
     std::cout << (c3 == c4) << '\n';
+
+    std::vector<Computation> path {};
+    phase_1<3, 3>(path);
+    phase_2<3, 3, false>(path);
+    phase_3_worst<3, 3>(path);
+
+    for (auto c : path) {
+        std::cout << std::format("{} ", c);
+    }
+    std::cout << '\n';
 
     return 0;
 }
