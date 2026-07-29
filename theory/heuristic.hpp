@@ -1,6 +1,7 @@
 #ifndef HEURISTIC_HPP
 #define HEURISTIC_HPP
 
+#include <cstddef>
 #include <utility>
 #include <vector>
 
