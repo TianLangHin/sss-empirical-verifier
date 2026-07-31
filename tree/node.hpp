@@ -117,8 +117,6 @@ public:
 
     bool is_ancestor_of(const Node& other) {
         // Comparison as per Lemma A.3.1.
-        // The additional clause of `length < other.length` is added due to the assumption of Lemma A.3.1,
-        // and that it is impossible for a longer node to be the ancestor of a shorter or equal-lengthed one.
         uint64_t base = power[length];
         return length < other.length && ancestry % base == other.ancestry % base;
     }
