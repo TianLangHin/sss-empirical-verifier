@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <functional>
 #include <numeric>
 #include <ranges>
 
@@ -24,7 +25,7 @@ std::vector<int> best_case(std::size_t width, std::size_t depth) {
         auto [p, q] = decision_sequences(node);
 
         // `optimal_p` is the vector representing the required structure of `p` given some `q`
-        // such that the second line of the heuristic given by Definition 5.1 is satisfied.
+        // such that the first line of the heuristic given by Definition 5.1 is satisfied.
         // The value `z` is the 1-based index of the first element in `q` that is not equal to 1.
         std::size_t z = std::distance(q.begin(), std::find_if(q.begin(), q.end(), [](int move) { return move != 1; })) + 1;
         std::vector<int> optimal_p(half_ceil(depth));
@@ -33,21 +34,21 @@ std::vector<int> best_case(std::size_t width, std::size_t depth) {
         }
 
         // To identify which kind of value the node will take on,
-        // we check the equalities of whether `p = {w}^ceil(d/2)` and `q = {1}^floor(d/2)`.
-        bool p_is_all_w = std::all_of(p.begin(), p.end(), [=](int i) { return i == w; });
-        bool q_is_all_1 = std::all_of(q.begin(), q.end(), [](int i) { return i == 1; });
+        // we check whether `q = {1}^floor(d/2)`.
+        bool q_is_all_ones = std::all_of(q.begin(), q.end(), [](int i) { return i == 1; });
 
-        if ((p_is_all_w && q_is_all_1) || p == optimal_p) {
-            // The first two cases of the expression in Definition 5.1.
+        if (!q_is_all_ones && p == optimal_p) {
+            // The first case of the expression in Definition 5.1.
             value = pow(w, half_ceil(d));
-        } else if (!p_is_all_w && q_is_all_1) {
-            // The third case of the expression in Definition 5.1.
-            auto terms = std::views::iota(1, half_ceil(d) + 1)
-                       | std::views::transform([&](int k) { return pow(w, half_ceil(d) - k) * (p[k-1] - 1); });
-            value = 1 + std::reduce(terms.begin(), terms.end());
+        } else if (q_is_all_ones) {
+            // The second case of the expression in Definition 5.1.
+
+            // Helper lambda to return the `k`-th term of the summation in the case where `q = {1}^floor(d/2)`.
+            auto p_term = [&](int k) { return pow(w, half_ceil(d) - k) * (p[k-1] - 1); };
+            value = std::ranges::fold_left(std::views::iota(1, half_ceil(d) + 1) | std::views::transform(p_term), 1, std::plus {});
         } else {
-            // The fourth case of the expression in Definition 5.1.
-            // In this case, the value chosen is 0, although any other value can be chosen.
+            // The third case of the expression in Definition 5.1.
+            // In this case, the value chosen is 0, but any other value can be chosen.
             value = 0;
         }
 
